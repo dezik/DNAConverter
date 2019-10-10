@@ -14,17 +14,21 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class DnaSequencerTest {
 
+    private static final String PATH_TO_VALID_INPUT_FILE = "./src/test/resources/data/input";
+    private static final String PATH_TO_EMPTY_INPUT_FILE = "./src/test/resources/data/empty_file";
+    private static final String PATH_TO_OUTPUT_FILE = "./src/test/resources/data/output";
+
     @ParameterizedTest
     @ValueSource(ints = {7, 15, 80})
     void shouldSequenceDnaCorrectly(int L) throws IOException {
-        String actualResult = normalize(DnaSequencer.sequenceDna("./src/test/resources/data/input", L));
-        String expectedResult = normalize(readFileAsString("./src/test/resources/data/output" + L));
+        String actualResult = normalizeString(DnaSequencer.sequenceDna(PATH_TO_VALID_INPUT_FILE, L));
+        String expectedResult = normalizeString(readFileAsString(PATH_TO_OUTPUT_FILE + L));
         assertEquals(expectedResult, actualResult);
     }
 
     @Test
     void shouldReturnEmptySequenceForEmptyFile() throws FileNotFoundException {
-        assertEquals("", DnaSequencer.sequenceDna("./src/test/resources/data/empty_file", 10));
+        assertEquals("", DnaSequencer.sequenceDna(PATH_TO_EMPTY_INPUT_FILE, 10));
     }
 
     @Test
@@ -41,7 +45,7 @@ class DnaSequencerTest {
     @Test
     void shouldThrowExceptionIfLLessThan1() {
         assertThrows(IllegalArgumentException.class, ()
-                -> DnaSequencer.sequenceDna("./src/test/resources/data/input", 0));
+                -> DnaSequencer.sequenceDna(PATH_TO_VALID_INPUT_FILE, 0));
     }
 
     static String readFileAsString(String path) throws IOException {
@@ -49,7 +53,9 @@ class DnaSequencerTest {
         return new String(encoded);
     }
 
-    static String normalize(String string) {
-        return string.replace("\r\n", "\n").replace('\r', '\n').trim();
+    static String normalizeString(String string) {
+        return string.replace("\r\n", System.lineSeparator())
+                .replace("\r", System.lineSeparator())
+                .trim();
     }
 }
